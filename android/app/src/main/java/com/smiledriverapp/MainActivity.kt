@@ -1,4 +1,4 @@
-package com.smiledriverapp
+package com.vttechnologies.smiledriverapp
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

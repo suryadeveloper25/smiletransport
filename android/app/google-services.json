@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "230890301432",
+    "project_id": "smiledriverapp",
+    "storage_bucket": "smiledriverapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230890301432:android:d575e3b5e01957a237180d",
+        "android_client_info": {
+          "package_name": "com.vttechnologies.smiledriverapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9WmXIlIg3sFm3UdK8R-Mar7clAZ87biM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -5,41 +5,24 @@
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import React from 'react';
+import 'react-native-gesture-handler';
+import { Provider} from 'react-redux';
+import { store } from './Root/store';
+import MainScreen from './Src';
+import FlashMessage from 'react-native-flash-message';
+import usePushNotification from './Src/pushNotification';
+import useInAppUpdate from './Src/hooks/useInAppUpdate';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
+const App = () => {
+usePushNotification();
+ 	useInAppUpdate();
+	return (
+	<Provider store={store}>
+			<MainScreen />
+			<FlashMessage position="bottom" />
+		</Provider>
+	);
 }
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;
