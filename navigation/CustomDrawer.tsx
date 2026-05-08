@@ -10,9 +10,9 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
- import MaterialIcons from "@react-native-vector-icons/material-icons";
+import MaterialIcons from "@react-native-vector-icons/material-icons";
 import { useDispatch, } from "react-redux";
-import {logoutAction} from '../Root/userAction';
+import { logoutAction } from '../Root/userAction';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -30,35 +30,35 @@ interface DrawerContentProps {
 }
 
 const CustomDrawer: React.FC<DrawerContentProps> = () => {
-//   const [studentData, setStudentData] = useState<any>({});
- const [customAlertVisible, setCustomAlertVisible] = useState(false);
- const navigation = useNavigation();
- const dispatch = useDispatch()
- const [ordId, setOrgId] = useState<string>("");
- const [driverId, setDriverId] = useState<string>("");
- const [profile, setProfile] = useState(null);
- const [loading, setLoading] = useState(false);
+  //   const [studentData, setStudentData] = useState<any>({});
+  const [customAlertVisible, setCustomAlertVisible] = useState(false);
+  const navigation = useNavigation();
+  const dispatch = useDispatch()
+  const [ordId, setOrgId] = useState<string>("");
+  const [driverId, setDriverId] = useState<string>("");
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-const getUser = async () => {
+  const getUser = async () => {
     const ordId = await AsyncStorage.getItem("orgId");
     const driverId = await AsyncStorage.getItem("driver_Id");
     setOrgId(ordId || "");
     setDriverId(driverId || "");
 
-};
+  };
 
   const getProfile = async () => {
     try {
       setLoading(true);
 
-     const ordId = await AsyncStorage.getItem("orgId");
-     const driverId = await AsyncStorage.getItem("driver_Id");
+      const ordId = await AsyncStorage.getItem("orgId");
+      const driverId = await AsyncStorage.getItem("driver_Id");
 
       const response = await axios.post(
         "https://www.vtsmile.in/app/api/driver/driver_profile_api?orgId=" + ordId + "&driver_Id=" + driverId,
       );
 
-      console.log("Profile API Response:", response.data);
+      // console.log("Profile API Response:", response.data);
 
       if (response.data.isSuccess) {
         setProfile(response.data.driverDetails[0]);
@@ -73,38 +73,38 @@ const getUser = async () => {
     }
   };
 
- 
+
   const Logout = async () => {
     try {
-    await AsyncStorage.removeItem("FCM Token");
-    await AsyncStorage.removeItem("sessionToken"); // if you store login token
-    await AsyncStorage.removeItem("isLoggedIn");   // if you track login
+      await AsyncStorage.removeItem("FCM Token");
+      await AsyncStorage.removeItem("sessionToken"); // if you store login token
+      await AsyncStorage.removeItem("isLoggedIn");   // if you track login
 
-    dispatch(logoutAction());
-    navigation.navigate("Login");
-    showMessage({
-      message: "Logged Out",
-      description: "You have successfully logged out!",
-      type: "success",
-      backgroundColor: "#1E90FF",
-      color: "#FFFFFF",
-    });
-  } catch (e) {
-    console.log("Error during logout", e);
-     console.log("Logout error", e);
+      dispatch(logoutAction());
+      navigation.navigate("Login");
       showMessage({
-      message: "Logout Failed",
-      description: "Something went wrong. Please try again!",
-      type: "danger",
-      backgroundColor: "#FF4C4C",
-      color: "#FFFFFF",
-    });
+        message: "Logged Out",
+        description: "You have successfully logged out!",
+        type: "success",
+        backgroundColor: "#1E90FF",
+        color: "#FFFFFF",
+      });
+    } catch (e) {
+      console.log("Error during logout", e);
+      console.log("Logout error", e);
+      showMessage({
+        message: "Logout Failed",
+        description: "Something went wrong. Please try again!",
+        type: "danger",
+        backgroundColor: "#FF4C4C",
+        color: "#FFFFFF",
+      });
+    }
   }
-  }
-    const confirmLogout = () => {
-        setCustomAlertVisible(true); // show custom alert
-         return true; // prevent default back action
-      };
+  const confirmLogout = () => {
+    setCustomAlertVisible(true); // show custom alert
+    return true; // prevent default back action
+  };
   // const confirmLogout = () => {
   //       Alert.alert("Logout Info", "Are you sure you want to logout?", [
   //         { text: "No", style: "cancel",},
@@ -112,89 +112,89 @@ const getUser = async () => {
   //       ]);
   //     };
 
-      
-useEffect(() => {
-  getUser();
-}, []);
 
-useEffect(() => {
-  if (ordId && driverId) {
-    getProfile();
-  }
-}, [ordId, driverId]);
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (ordId && driverId) {
+      getProfile();
+    }
+  }, [ordId, driverId]);
 
   return (
     <View style={styles.container}>
 
       {/* ================= PROFILE SECTION ================= */}
       <View style={styles.profileSection}>
-       
-          <View style={styles.profileImage1}>
-             <Image
-                source={
-                  profile?.driver_img && profile.driver_img !== ""
-                    ? { uri: "https://www.vtsmile.in/app/" + profile.driver_img }
-                    : require("../assets/icons8-administrator-male-50.png")
-                }
-                style={styles.profileImage}
-              />
-              {/* <Image
+
+        <View style={styles.profileImage1}>
+          <Image
+            source={
+              profile?.driver_img && profile.driver_img !== ""
+                ? { uri: "https://www.vtsmile.in/app/" + profile.driver_img }
+                : require("../assets/icons8-administrator-male-50.png")
+            }
+            style={styles.profileImage}
+          />
+          {/* <Image
                         style={styles.profileImage}
                         source={require('../assets/icons8-administrator-male-50.png')}
                       /> */}
-                        <Text style={styles.welcomeText}>{profile?.driver_name || ""}</Text>
-          </View>
-        
-            <Text style={styles.welcomeText1}>{profile?.driver_mobile || ""}</Text>
-          <Divider style={styles.divider1} />
+          <Text style={styles.welcomeText}>{profile?.driver_name || ""}</Text>
+        </View>
+
+        <Text style={styles.welcomeText1}>{profile?.driver_mobile || ""}</Text>
+        <Divider style={styles.divider1} />
       </View>
 
-     
+
       <View style={styles.menuContainer}>
-          <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: 'row', marginTop: 20 }}>
-          <MaterialIcons name="person" size={30} style={{ marginRight: 10, color: '#fff' }} />
-          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-            <Text style={styles.link}>Profile</Text>
-          </TouchableOpacity>
-        </View>
-  
-     
-        {/* <View style={{ flexDirection: 'row', marginTop: 20 }}>
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', marginTop: 20 }}>
+            <MaterialIcons name="person" size={30} style={{ marginRight: 10, color: '#fff' }} />
+            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+              <Text style={styles.link}>Profile</Text>
+            </TouchableOpacity>
+          </View>
+
+
+          {/* <View style={{ flexDirection: 'row', marginTop: 20 }}>
           <MaterialIcons name="notifications-none" size={30} style={{ marginRight: 10, color: '#fff' }} />
           <TouchableOpacity onPress={() => navigation.navigate('Notification')}>
             <Text style={styles.link}>Notification</Text>
           </TouchableOpacity>
         </View> */}
-        <View style={{ flexDirection: 'row', marginTop: 20 }}>
-          <MaterialIcons name="settings" size={30} style={{ marginRight: 10, color: '#fff' }} />
-          <TouchableOpacity onPress={() => navigation.navigate('About')}>
-            <Text style={styles.link}>Setting</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ flexDirection: 'row', marginTop: 20 }}>
-          <MaterialIcons name="logout" size={30} style={{ marginRight: 10, color: '#fff' }} />
-          <TouchableOpacity onPress={confirmLogout}>
-      
-            <Text style={styles.link}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-        {/* <Text style={styles.footerText}>{'VT Technologies SMILE v14.9'}</Text> */}
+          <View style={{ flexDirection: 'row', marginTop: 20 }}>
+            <MaterialIcons name="settings" size={30} style={{ marginRight: 10, color: '#fff' }} />
+            <TouchableOpacity onPress={() => navigation.navigate('About')}>
+              <Text style={styles.link}>Setting</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ flexDirection: 'row', marginTop: 20 }}>
+            <MaterialIcons name="logout" size={30} style={{ marginRight: 10, color: '#fff' }} />
+            <TouchableOpacity onPress={confirmLogout}>
+
+              <Text style={styles.link}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+          {/* <Text style={styles.footerText}>{'VT Technologies SMILE v14.9'}</Text> */}
 
 
-      </View>
+        </View>
       </View>
 
       {/* ================= LOGOUT MODAL ================= */}
       <Modal visible={customAlertVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            <View style={{flexDirection: 'row'}}>
-                   <MaterialIcons name="crisis-alert" size={hp("4%")} color="#981313" />
-            <Text style={styles.modalTitle}>Confirm Logout</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <MaterialIcons name="crisis-alert" size={hp("4%")} color="#981313" />
+              <Text style={styles.modalTitle}>Confirm Logout</Text>
             </View>
             <Divider style={styles.divider} />
-           
+
             <Text style={styles.modalMsg}>Are you sure you want to Logout?</Text>
 
             <View style={styles.modalRow}>
@@ -226,44 +226,44 @@ export default CustomDrawer;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:"#f6b93b",
+    backgroundColor: "#f6b93b",
     padding: wp("5%"),
-    borderTopRightRadius:10,
-    borderBottomRightRadius:10
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10
   },
 
-    link: {
+  link: {
     fontSize: 18,
     marginVertical: 5, marginLeft: 10,
     color: '#FFF',
-    fontFamily:fonts.ROBOTO_BOLD
-  }, 
+    fontFamily: fonts.ROBOTO_BOLD
+  },
 
   profileSection: {
-  // backgroundColor:'red',
+    // backgroundColor:'red',
     paddingBottom: hp("15%"),
   },
- divider: {
+  divider: {
     height: 1, backgroundColor: '#5b5959ff', marginVertical: 10, width: '115%',
   },
-   divider1: {
-    height: 1, backgroundColor: '#f4f4f4ff', marginVertical: 35, width: '110%',right:wp(3.5)
+  divider1: {
+    height: 1, backgroundColor: '#f4f4f4ff', marginVertical: 35, width: '110%', right: wp(3.5)
   },
   profileImage: {
     width: wp("18%"),
     height: hp("20%"),
     resizeMode: "contain",
     bottom: wp('11%'),
-    left:wp(1)
+    left: wp(1)
   },
-    profileImage1: {
-    flexDirection:'row',
+  profileImage1: {
+    flexDirection: 'row',
     width: wp("20%"),
     height: hp("10%"),
-    backgroundColor:'#ffffffff',
+    backgroundColor: '#ffffffff',
     top: hp(5),
-    borderRadius:15
-   
+    borderRadius: 15
+
   },
 
   titleText: {
@@ -273,20 +273,20 @@ const styles = StyleSheet.create({
     bottom: hp(9)
   },
 
- 
+
   welcomeText: {
     color: "#fff",
-    width:'270%',
+    width: '270%',
     fontSize: 20,
-    marginLeft:20,
-    marginTop:10,
+    marginLeft: 20,
+    marginTop: 10,
     fontFamily: fonts.ROBOTO_BOLD
   },
-    welcomeText1: {
+  welcomeText1: {
     color: "#fff",
-    width:'270%',
+    width: '270%',
     fontSize: 20,
-    marginLeft:wp('24%'),
+    marginLeft: wp('24%'),
     fontFamily: fonts.ROBOTO_BOLD
   },
 
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     fontSize: hp("2.4%"),
     color: "#fff",
     marginLeft: wp("3%"),
-//   fontFamily:fonts.FONT_BOLD,
+    //   fontFamily:fonts.FONT_BOLD,
 
   },
 

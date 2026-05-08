@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, TouchableWithoutFeedback, Keyboard, Alert, ActivityIndicator, Modal, BackHandler, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Card, Divider } from 'react-native-paper';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import axios from "axios";

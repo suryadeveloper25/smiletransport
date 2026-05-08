@@ -21,7 +21,7 @@
 //   useEffect(() => {
 //     // getDeviceToken();
 //   }, []);
-  
+
 
 //   return (
 //     <View style={styles.container}>
@@ -29,7 +29,7 @@
 //         {/* <Image source={require('../assest/smile-logo.png')} /> */}
 
 //         <Text style={styles.subtitle}>Login to access faculty information.</Text>
- 
+
 //         <Text style={styles.label}>Mobile No.</Text>
 //         <View style={styles.inputBox}>
 //           <MaterialIcons name="phone" size={22} color="#666" style={styles.icon} />
@@ -167,16 +167,16 @@
 
 
 import React, { useCallback, useEffect, useState } from 'react';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Alert,
   BackHandler,
+  NativeModules,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -186,17 +186,52 @@ import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fonts } from '../Root/Config';
 import messaging from '@react-native-firebase/messaging';
-import { showMessage,} from "react-native-flash-message";
-
+import { showMessage, } from "react-native-flash-message";
+import { SafeAreaView } from 'react-native-safe-area-context';
+const { PhoneNumberHint } = NativeModules
 const LoginScreen = () => {
-   const navigation =useNavigation();
+  const navigation = useNavigation();
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
+  const getPhoneNumber = async () => {
+    try {
+      const number = await PhoneNumberHint.showPhoneNumberHint();
 
- const dispatch =useDispatch();
-   const getNewFcmToken = async () => {
+      const digitsOnly = number.replace(/\D/g, '');
+      // Get last 10 digits
+      const last10Digits = digitsOnly.slice(-10);
+
+      setMobile(last10Digits);
+      // page === 'login' ? generateOtp(last10Digits) : createUser(last10Digits);
+    } catch (error: unknown) {
+      let message = "Something went wrong while fetching the phone number.";
+
+      // Type-safe way to access message
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === "string") {
+        message = error;
+      }
+
+      console.error("PhoneNumberHint error:", error);
+      // showValidationError(message);
+    }
+  };
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      // const consent = await AsyncStorage.getItem("phoneNumberConsent");
+      // if (consent === "true") {
+      getPhoneNumber();
+      // }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+  const dispatch = useDispatch();
+
+  const getNewFcmToken = async () => {
     try {
       await messaging().deleteToken();
       const newToken = await messaging().getToken();
@@ -231,11 +266,11 @@ const LoginScreen = () => {
       const loginURL =
         `https://www.vtsmile.in/app/api/driver/driver_login_api?driver_mobile=${encodeURIComponent(mobile)}&driver_licence=${encodeURIComponent(password)}`;
 
-      console.log("LOGIN URL:", loginURL);
+      // console.log("LOGIN URL:", loginURL);
 
       const loginRes = await axios.post(loginURL);
 
-      console.log("LOGIN RESPONSE:", loginRes.data);
+      // console.log("LOGIN RESPONSE:", loginRes.data);
 
       if (!loginRes?.data?.isSuccess) {
         showMessage({
@@ -255,7 +290,7 @@ const LoginScreen = () => {
 
       // GET FCM TOKEN AFTER SUCCESSFUL LOGIN
       const token = await getNewFcmToken();
-
+      console.log("token==>", token)
       if (!token) {
         showMessage({
           message: "FCM Error",
@@ -272,11 +307,11 @@ const LoginScreen = () => {
       const fcmUpdateURL =
         `https://www.vtsmile.in/app/api/driver/driver_login_fcmtoken_update_api?orgId=${encodeURIComponent(orgId)}&driverId=${encodeURIComponent(driverId)}&FCMToken=${encodeURIComponent(token)}`;
 
-      console.log("FCM UPDATE URL:", fcmUpdateURL);
+      // console.log("FCM UPDATE URL:", fcmUpdateURL);
 
       const fcmRes = await axios.post(fcmUpdateURL);
 
-      console.log("FCM UPDATE RESPONSE:", fcmRes.data);
+      // console.log("FCM UPDATE RESPONSE:", fcmRes.data);
 
       if (!fcmRes?.data?.isSuccess) {
         showMessage({
@@ -320,126 +355,97 @@ const LoginScreen = () => {
     }
   };
 
-useFocusEffect(
-  React.useCallback(() => {
-    const onBackPress = () => {
-      BackHandler.exitApp();   // or navigation.goBack()
-      return true;
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();   // or navigation.goBack()
+        return true;
+      };
 
-    // add listener
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      onBackPress
-    );
+      // add listener
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
 
-    // cleanup correctly
-    return () => backHandler.remove();
-  }, [])
-);
+      // cleanup correctly
+      return () => backHandler.remove();
+    }, [])
+  );
 
 
   return (
     <SafeAreaView style={styles.root}>
       <View style={styles.card}>
         {/* Top orange header */}
-      <View style={styles.headerTop}>
-  <LinearGradient
-    colors={['#FF5A3C', '#FF5A3C']}
-    style={{ flex: 1 }}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-  />
-</View>
+        <View style={styles.headerTop}>
+          <LinearGradient
+            colors={['#FF5A3C', '#FF5A3C']}
+            style={{ flex: 1 }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        </View>
         <View style={styles.headerTriangle}>
-  <LinearGradient
-    colors={['#FF5A3C','#FF5A3C']}
-    style={{ flex: 1 }}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-  />
-</View>
+          <LinearGradient
+            colors={['#FF5A3C', '#FF5A3C']}
+            style={{ flex: 1 }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        </View>
 
 
         <View style={styles.content}>
           <Text style={styles.title}>User Login</Text>
 
 
-<Text style={styles.label}>Mobile No</Text>
-         <View style={styles.inputBox}>
-           <MaterialIcons name="phone" size={22} color="#666" style={styles.icon} />
-           <TextInput
-            style={styles.input}
-            placeholderTextColor={'black'}
-            placeholder="Your Mobile No"
-            keyboardType="phone-pad"
-            maxLength={10}
-            value={mobile}
-            onChangeText={setMobile}
-          />
-        </View>
-        {/* {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null} */}
+          <Text style={styles.label}>Mobile No</Text>
+          <View style={styles.inputBox}>
+            <MaterialIcons name="phone" size={22} color="#666" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={'black'}
+              placeholder="Your Mobile No"
+              keyboardType="phone-pad"
+              maxLength={10}
+              value={mobile}
+              onChangeText={setMobile}
 
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.inputBox}>
-          <MaterialIcons name="lock" size={22} color="#666" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={'black'}
-            placeholder="Your Password"
-            secureTextEntry={passwordVisible}
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-            <MaterialIcons
-              name={passwordVisible ? "visibility-off" : "visibility"}
-              size={22}
-              color="#666"
             />
-          </TouchableOpacity>
-        </View>
+          </View>
+          {/* {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null} */}
 
-        <TouchableOpacity style={styles.loginBtn} onPress={logIn} disabled={isLoading} >
-          <Text style={styles.loginButtonText}>LOGIN</Text>
-        </TouchableOpacity>
-  
-      </View>
-          {/* <TextInput
-            style={styles.input}
-            placeholderTextColor="#f9b7a0"
-            placeholder="Your Mobile No."
-            keyboardType="phone-pad"
-            maxLength={10}
-            value={mobile}
-            onChangeText={setMobile}
-          />
-
-
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#f9b7a0"
-            secureTextEntry={passwordVisible}
-            value={password}
-            onChangeText={setPassword}
-          />
-           <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-             <MaterialIcons
-              name={passwordVisible ? "visibility-off" : "visibility"}
-              size={22}
-              color="#666"
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.inputBox}>
+            <MaterialIcons name="lock" size={22} color="#666" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={'black'}
+              placeholder="Your Password"
+              secureTextEntry={passwordVisible}
+              value={password}
+              onChangeText={setPassword}
             />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <MaterialIcons
+                name={passwordVisible ? "visibility-off" : "visibility"}
+                size={22}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.loginBtn} onPress={logIn} disabled={isLoading} >
+            <Text style={styles.loginButtonText}>LOGIN</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginBtn}>
-            <Text style={styles.loginText}>LOGIN</Text>
-          </TouchableOpacity> */}
+        </View>
 
-       
-        
+
+
       </View>
-             <Text style={styles.powered}>Powered by VT Technologies</Text>
+      <Text style={styles.powered}>Powered by VT Technologies</Text>
     </SafeAreaView>
   );
 };
@@ -469,12 +475,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5A3C',
     transform: [{ rotate: '-10deg' }],
     width: '120%',
-    bottom:35,
-    right:20
-   
+    bottom: 35,
+    right: 20
+
   },
 
-   label: {
+  label: {
     alignSelf: 'flex-start',
     fontSize: 14,
     fontFamily: fonts.ROBOTO_BOLD,
@@ -494,7 +500,7 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 8
   },
- 
+
   loginButton: {
     marginTop: 28,
     backgroundColor: '#5517adff',
@@ -505,31 +511,31 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: '#fff',
-     fontFamily: fonts.FONT_BOLD,
+    fontFamily: fonts.FONT_BOLD,
     fontSize: 16,
     letterSpacing: 1.2
   },
   forgot: {
     marginTop: 16,
     color: '#444',
-    fontWeight:'bold'
+    fontWeight: 'bold'
   },
   powered: {
     marginTop: 24,
     color: '#981a1aff',
     fontSize: 13,
     letterSpacing: 1,
-     fontFamily: fonts.ROBOTO_BOLD,
+    fontFamily: fonts.ROBOTO_BOLD,
   },
   headerTriangle: {
     position: 'absolute',
     right: -CARD_WIDTH * 0.3,
-    top:-24,
+    top: -24,
     width: '145%',
     height: 110,
     backgroundColor: '#ffcabaff',
     transform: [{ rotate: '15deg' }],
-    
+
   },
   content: {
     paddingHorizontal: 24,
@@ -557,7 +563,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 10,
     color: '#222',
-     fontFamily: fonts.ROBOTO_MEDIUM,
+    fontFamily: fonts.ROBOTO_MEDIUM,
   },
 
   loginBtn: {
@@ -571,9 +577,9 @@ const styles = StyleSheet.create({
   loginText: {
     color: '#fff',
     fontSize: 16,
-     fontFamily: fonts.FONT_BOLD,
+    fontFamily: fonts.FONT_BOLD,
   },
- 
+
 });
 
 export default LoginScreen;

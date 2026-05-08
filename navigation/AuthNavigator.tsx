@@ -24,9 +24,7 @@ export const ApplicationNavigator: React.FC = () => {
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name= 'Setting' component={SettingScreen} options={{ headerShown:false}} />
-      <Stack.Screen name= 'Notification' component={NotificationScreen} options={{headerShown: false}} />
-        <Stack.Screen name= 'ResetPassword' component={ResetPasswordScreen} options={{headerShown: false}} />
-         <Stack.Screen name= 'About' component={AboutScreen} options={{headerShown: false}} />
+      <Stack.Screen name= 'About' component={AboutScreen} options={{headerShown: false}} />
     </Stack.Navigator>
   );
 }
@@ -37,8 +35,7 @@ export const AuthNavigator: React.FC = () => {
   return (
     <AuthStack.Navigator initialRouteName='Splash' screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
-      <AuthStack.Screen name='Login' component={LoginScreen} />
-      {/* <AuthStack.Screen name='ForgotPassword' component={ForgotPasswordScreen} /> */}
+      <AuthStack.Screen name='Login' component={LoginScreen} options={{ headerShown: false }} />
       <AuthStack.Screen name="DrawerNav" component={DrawerNav} options={{ headerShown: false }} />
 
     </AuthStack.Navigator>
@@ -62,8 +59,6 @@ export const DrawerNav: React.FC = () => {
       <Drawer.Screen name="Home" component={HomeScreen}  options={{ headerShown: false }} />
       <Drawer.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
       <Drawer.Screen name= 'Setting' component={SettingScreen} options={{ headerShown:false}} />
-      <Drawer.Screen name= 'Notification' component={NotificationScreen} options={{headerShown: false}} />
-      <Drawer.Screen name= 'ResetPassword' component={ResetPasswordScreen} options={{headerShown: false}} />
       <Drawer.Screen name= 'About' component={AboutScreen} options={{headerShown: false}} />
       <Drawer.Screen name='Login' component={LoginScreen}   options={{headerShown: false}} />
     </Drawer.Navigator>
